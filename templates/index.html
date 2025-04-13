@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Judol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        },
+                        gray: {
+                            100: '#f3f4f6',
+                            800: '#1f2937',
+                            900: '#111827',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'float': 'float 3s ease-in-out infinite',
+                        'spin': 'spin 1s linear infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        spin: {
+                            '0%': { transform: 'rotate(0deg)' },
+                            '100%': { transform: 'rotate(360deg)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .smooth-shadow {
+                box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-md hover:-translate-y-0.5;
+            }
+            .drag-over {
+                @apply border-primary-500 bg-primary-50;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-100 font-sans antialiased">
+    <div class="container mx-auto px-4 py-12 max-w-3xl">
+        <!-- Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <div class="w-16 h-16 bg-primary-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-semibold text-gray-900 mb-2">NoJudol</h1>
+            <p class="text-gray-600">Jangan biarkan iklan judi online berkeliaran.</p>
+        </div>
+
+        <div class="bg-white rounded-xl p-8 smooth-shadow card-hover animate-fade-in">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6" id="uploadForm">
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Upload image</label>
+                    <div id="dropzone"
+                        class="mt-1 flex justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg transition-colors">
+                        <div class="text-center" id="uploadInfo">
+                            <svg class="mx-auto h-12 w-12 text-gray-400 animate-float" stroke="currentColor" fill="none"
+                                viewBox="0 0 48 48" aria-hidden="true">
+                                <path
+                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600 justify-center">
+                                <label for="file-upload"
+                                    class="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none">
+                                    <span>Upload a file</span>
+                                    <input id="file-upload" name="image" type="file" class="sr-only" accept="image/*"
+                                        required>
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                            <p id="fileName" class="text-sm text-green-600 font-medium mt-3 hidden"></p>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" id="analyzeBtn"
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+                    <span id="btnText">Analyze Image</span>
+                    <span id="loadingSpinner" class="hidden ml-2">
+                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                    </span>
+                    <svg id="btnIcon" xmlns="http://www.w3.org/2000/svg" class="ml-2 -mr-1 h-4 w-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        {% if result %}
+        <div class="mt-8 space-y-6 animate-fade-in">
+            <div class="bg-white rounded-xl p-6 smooth-shadow card-hover">
+                <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Detection Result</h3>
+                <div class="flex items-center">
+                    {% if "Tidak terdeteksi" in result %}
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    {% else %}
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    {% endif %}
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">{{ result }}</h3>
+                        <p class="text-sm text-gray-500 mt-1">Analyzed at {{ now }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if image_url %}
+            <div class="bg-white rounded-xl overflow-hidden smooth-shadow card-hover">
+                <img src="{{ url_for('static', filename='uploads/' + image_url) }}" alt="Analyzed image"
+                    class="w-full h-auto rounded-lg">
+            </div>
+            {% else %}
+            <div class="bg-white rounded-xl p-6 smooth-shadow card-hover">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-medium text-gray-900">Image hidden</h3>
+                        <p class="text-sm text-gray-500 mt-1">This image contains gambling content and has been blocked
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="mt-12 text-center text-sm text-gray-500 animate-fade-in">
+            <p>© 2025 NoJudol. All rights reserved.</p>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+</body>
+</html>
